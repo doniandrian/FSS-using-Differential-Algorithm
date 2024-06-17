@@ -1,0 +1,4 @@
+Urutan job terbaik : 
+5 9 15 13 1 2 16 20 6 14 8 11 7 10 19 17 4 18 3 12 
+Makespan : 1404
+

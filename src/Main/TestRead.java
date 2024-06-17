@@ -24,7 +24,6 @@ public class TestRead {
     private String lokasiFile;
     private int[] batasAtas;
     private int[] batasBawah;
-    private double faktorSkala;
 
     public TestRead(String lokasiFile) {
         this.lokasiFile = lokasiFile;
@@ -76,7 +75,8 @@ public class TestRead {
                     this.batasAtas[hitungBatas] = Integer.parseInt(st.nextToken());
                     this.batasBawah[hitungBatas] = Integer.parseInt(st.nextToken());
                     hitungBatas++;
-                } else if ((i - 1) % (this.banyakMesin + 3) == 0) {
+                }
+                else if((i-1) % (this.banyakMesin+3) == 0){
                     st = new StringTokenizer(baris);
                     st.nextToken();
                     st.nextToken();
@@ -85,7 +85,7 @@ public class TestRead {
                     this.batasBawah[hitungBatas] = Integer.parseInt(st.nextToken());
                     hitungBatas++;
                 }
-                if (i % (this.banyakMesin + 3) != 0 && (i - 1) % (this.banyakMesin + 3) != 0) {
+                if (i % (this.banyakMesin+3) != 0 && (i - 1) % (this.banyakMesin+3) != 0) {
                     isi += baris + "\n";
                 }
                 i++;
@@ -117,8 +117,8 @@ public class TestRead {
                         urutanPekerjaan[j][k] = Integer.parseInt(st.nextToken());
                     }
                 }
-                if (i < 11) {
-                    this.kumpulanSoal[i - 1].setSoal(urutanPekerjaan);
+                if(i<11){
+                    this.kumpulanSoal[i-1].setSoal(urutanPekerjaan);
                 }
                 urutanPekerjaan = new int[this.banyakMesin][this.banyakPekerjaan];
             }

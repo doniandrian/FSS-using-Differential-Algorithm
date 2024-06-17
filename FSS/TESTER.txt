@@ -1,0 +1,50 @@
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   987654321        310        260
+processing times :
+ 65 48 34 22 90
+ 88 14 77 43 21
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   234567890        320        270
+processing times :
+ 52 67 89 56 23
+ 74 11 95 37 45
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   345678901        330        280
+processing times :
+ 48 73 58 66 12
+ 82 16 81 49 33
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   456789012        300        255
+processing times :
+ 50 80 60 70 40
+ 85 25 65 35 55
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   567890123        315        265
+processing times :
+ 45 75 65 55 35
+ 60 20 70 30 50
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   678901234        305        275
+processing times :
+ 55 85 75 65 45
+ 70 30 80 40 60
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   789012345        295        285
+processing times :
+ 60 90 80 70 50
+ 75 35 85 45 65
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   890123456        325        255
+processing times :
+ 70 100 90 80 60
+ 85 45 95 55 75
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   901234567        340        290
+processing times :
+ 75 105 95 85 65
+ 90 50 100 60 80
+number of jobs, number of machines, initial seed, upper bound and lower bound :
+          5           2   123456788        335        285
+processing times :
+ 65 95 85 75 55
+ 80 40 90 50 70
