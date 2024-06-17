@@ -42,32 +42,24 @@ public class FSS {
     }
 
     private void hitungMakespan() {
-        int pekerjaan = -1;
-        int mesin = -1;
         for (int i = 0; i < this.jadwal.length; i++) {
             for (int j = 0; j < this.jadwal[0].length; j++) {
-                pekerjaan = this.individu.getUrutanPekerjaan()[j] - 1;
-                mesin = this.individu.getUrutanMesin()[i] - 1;
+                // Validasi indeks sebelum penggunaan
+                int indexPekerjaan = Math.floorMod(this.individu.getUrutanPekerjaan()[j] - 1, this.jadwal[0].length);
+                int indexMesin = Math.floorMod(this.individu.getUrutanMesin()[i] - 1, this.jadwal.length);
+    
+                int currentJob = this.jadwal[indexMesin][indexPekerjaan];
                 if (i == 0 && j == 0) {
-                    this.waktuAkhir[i][j] = this.jadwal[mesin][pekerjaan];
+                    this.waktuAkhir[i][j] = currentJob;
+                } else if (i == 0) {
+                    this.waktuAkhir[i][j] = currentJob + this.waktuAkhir[i][j - 1];
+                } else if (j == 0) {
+                    this.waktuAkhir[i][j] = currentJob + this.waktuAkhir[i - 1][j];
                 } else {
-                    if (i == 0) {
-                        this.waktuAkhir[i][j] = this.jadwal[mesin][pekerjaan] + this.waktuAkhir[i][j - 1];
-                    } else {
-                        if (j == 0) {
-                            this.waktuAkhir[i][j] = this.jadwal[mesin][pekerjaan] + this.waktuAkhir[i - 1][j];
-                        } else {
-                            if(this.waktuAkhir[i-1][j] <= this.waktuAkhir[i][j-1]){
-                                this.waktuAkhir[i][j] = this.jadwal[mesin][pekerjaan] + this.waktuAkhir[i][j-1];
-                            } else {
-                                this.waktuAkhir[i][j] = this.jadwal[mesin][pekerjaan] + this.waktuAkhir[i-1][j];
-                            }
-                        }
-                    }
+                    this.waktuAkhir[i][j] = currentJob + Math.max(this.waktuAkhir[i-1][j], this.waktuAkhir[i][j-1]);
                 }
-
             }
-
         }
     }
+    
 }

@@ -49,12 +49,12 @@ public class ALGEN {
                         randomInduk2 = rand.nextInt(this.individu.length);
                     }
                     periksaPeluang = rand.nextInt(100);
-                    if (periksaPeluang <= peluangCO) {
-                        this.individu[i] = this.crossover(this.individu[randomInduk1], this.individu[randomInduk2]);
-                    }
+                
+                     this.individu[i] = this.crossover(this.individu[randomInduk1], this.individu[randomInduk2],peluangCO);
+                
                     periksaPeluang = rand.nextInt(100);
                     if (periksaPeluang <= peluangMutasi) {
-                        this.individu[i] = this.mutasi(this.individu[i]);
+                        this.individu[i] = this.mutasi(this.individu[i], pemenang, pemenang, randomInduk2);
                     }
                 }
             }
@@ -99,11 +99,25 @@ public class ALGEN {
         return this.pemenang;
     }
 
-    public Individu crossover(Individu induk1, Individu induk2) {
-        int[] urutanPekerjaanAnak = this.crossoverPekerjaan(induk1.getUrutanPekerjaan(), induk2.getUrutanPekerjaan());
-        Individu indukBaru = new Individu(urutanPekerjaanAnak, induk1.getUrutanMesin().length);
-        return indukBaru;
+    public Individu crossover(Individu target, Individu mutan, double CR) {
+        Random rand = new Random();
+        int[] targetPekerjaan = target.getUrutanPekerjaan();
+        int[] mutanPekerjaan = mutan.getUrutanPekerjaan();
+        int[] trialPekerjaan = new int[targetPekerjaan.length];
+    
+        int jRand = rand.nextInt(targetPekerjaan.length); // Memilih indeks acak jRand
+    
+        for (int i = 0; i < targetPekerjaan.length; i++) {
+            if (rand.nextDouble() < CR || i == jRand) {
+                trialPekerjaan[i] = mutanPekerjaan[i];
+            } else {
+                trialPekerjaan[i] = targetPekerjaan[i];
+            }
+        }
+    
+        return new Individu(trialPekerjaan, target.getUrutanMesin().length);
     }
+    
 
     public int[] crossoverPekerjaan(int[] urutanPekerjaan1, int[] urutanPekerjaan2) {
         Random rand = new Random();
@@ -145,45 +159,7 @@ public class ALGEN {
         return urutanPekerjaanBaru;
     }
 
-//    public int[] crossoverMesin(int[] urutanMesin1, int[] urutanMesin2) {
-//        Random rand = new Random();
-//        int count1 = 0;
-//        int count2 = 0;
-//        int[] urutanMesinBaru = new int[urutanMesin1.length];
-//        for (int i = 0; i < urutanMesinBaru.length; i++) {
-//            urutanMesinBaru[i] = rand.nextInt(2);
-//            if (i == 0) {
-//                if (urutanMesinBaru[i] == 0) {
-//                    urutanMesinBaru[i] = urutanMesin1[count1];
-//                    count1++;
-//                } else {
-//                    urutanMesinBaru[i] = urutanMesin2[count2];
-//                    count2++;
-//                }
-//            } else {
-//                if (urutanMesinBaru[i] == 0) {
-//                    urutanMesinBaru[i] = urutanMesin1[count1];
-//                    while (this.checkCollisionCrossover(urutanMesinBaru, i, urutanMesin1[count1]) == false) {
-//                        count1++;
-//                        if(count1 > urutanMesin1.length){
-//                            count1 = 0;
-//                        }
-//                        urutanMesinBaru[i] = urutanMesin1[count1];
-//                    }
-//                } else {
-//                    urutanMesinBaru[i] = urutanMesin2[count2];
-//                    while (this.checkCollisionCrossover(urutanMesinBaru, i, urutanMesin2[count2]) == false) {
-//                        count2++;
-//                        if(count2 > urutanMesin2.length){
-//                            count2 = 0;
-//                        }
-//                        urutanMesinBaru[i] = urutanMesin2[count2];
-//                    }
-//                }
-//            }
-//        }
-//        return urutanMesinBaru;
-//    }
+
     public boolean periksaCrossover(int[] urutanPekerjaanBaru, int penunjuk, int urutanPekerjaan1) {
         for (int i = 0; i < penunjuk; i++) {
             if (urutanPekerjaanBaru[i] == urutanPekerjaan1) {
@@ -192,21 +168,25 @@ public class ALGEN {
         }
         return true;
     }
-
-    public Individu mutasi(Individu x) {
-        int[] penyimpanPekerjaan = x.getUrutanPekerjaan();
-        int[] penyimpanMesin = x.getUrutanMesin();
-        Random rand = new Random();
-        int randomPekerjaan1 = rand.nextInt(x.getUrutanPekerjaan().length);
-        int randomPekerjaan2 = rand.nextInt(x.getUrutanPekerjaan().length);
-        while (randomPekerjaan1 == randomPekerjaan2) {
-            randomPekerjaan1 = rand.nextInt(x.getUrutanPekerjaan().length);
-            randomPekerjaan2 = rand.nextInt(x.getUrutanPekerjaan().length);
+    public Individu mutasi(Individu base, Individu ind1, Individu ind2, double F) {
+        int[] basePekerjaan = base.getUrutanPekerjaan();
+        int[] ind1Pekerjaan = ind1.getUrutanPekerjaan();
+        int[] ind2Pekerjaan = ind2.getUrutanPekerjaan();
+    
+        int[] mutanPekerjaan = new int[basePekerjaan.length];
+    
+        for (int i = 0; i < basePekerjaan.length; i++) {
+            // Menerapkan mutasi sesuai formula DE: base + F * (ind1 - ind2)
+            int diff = ind1Pekerjaan[i] - ind2Pekerjaan[i];
+            mutanPekerjaan[i] = basePekerjaan[i] + (int)(F * diff);
+    
+            // Memastikan bahwa hasil mutasi tidak keluar dari batas yang valid
+            mutanPekerjaan[i] = Math.floorMod(mutanPekerjaan[i], basePekerjaan.length);
         }
-        int tampungPekerjaan = -1;
-        tampungPekerjaan = penyimpanPekerjaan[randomPekerjaan1];
-        penyimpanPekerjaan[randomPekerjaan1] = penyimpanPekerjaan[randomPekerjaan2];
-        penyimpanPekerjaan[randomPekerjaan2] = tampungPekerjaan;
-        return new Individu(penyimpanPekerjaan, penyimpanMesin.length);
+    
+        // Menciptakan individu baru dengan urutan pekerjaan yang telah dimutasi
+        return new Individu(mutanPekerjaan, base.getUrutanMesin().length);
     }
+    
+    
 }
