@@ -52,6 +52,8 @@ public class Hasil extends javax.swing.JFrame {
         tampung += "\n";
         int makespan = this.taillard.getMakespanPemenang()[soalTerpilih];
         tampung += "Makespan : " + makespan + "\n\n";
+
+         
         this.HasilTerurutTextArea.append(tampung);
 
         this.inisialisasi();

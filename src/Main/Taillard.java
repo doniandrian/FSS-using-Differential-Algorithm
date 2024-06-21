@@ -6,6 +6,8 @@
 
 package Main;
 
+import java.util.Random;
+
 import algen.ALGEN;
 import algen.Individu;
 
@@ -23,6 +25,11 @@ public class Taillard {
     private Soal[] tampungSoal;
     private int[][] daftarUrutanPekerjaan;
     private int soalTerpilih;
+    private Individu[] populasi;
+    private ALGEN[] algenArray;
+    
+    
+    
     
     public Taillard(String lokasiFile, int banyakIndividu,int maksIterasi, int peluangCO, int peluangMutasi, int soalTerpilih) {
         this.batasAtas = new int[10];
@@ -31,10 +38,24 @@ public class Taillard {
         this.pemenangTiapSoal = new Individu[10];
         this.makespanPemenang = new int[10];
         this.soalTerpilih = soalTerpilih;
+        this.algenArray = new ALGEN[10];
+
+
         for (int i = 0; i < 10; i++) {
-            this.hitungMS = new ALGEN(banyakIndividu, kasusTaillard.getKumpulanSoal()[i].getSoal(),maksIterasi,peluangCO,peluangMutasi);
-            this.pemenangTiapSoal[i] = this.hitungMS.getPemenang();
-            this.makespanPemenang[i] = this.hitungMS.getMakespanPemenang();
+            Random rand = new Random();
+             
+             double random = rand.nextDouble();
+             System.out.println("Random : " + random);
+             System.out.println("Batas Atas : " + this.kasusTaillard.getBatasAtas()[i]);
+            System.out.println("Batas Bawah : " + this.kasusTaillard.getBatasBawah()[i]);
+
+            //
+            int jmlPopulasi =  (int) ((batasBawah[i] + random * (this.kasusTaillard.getBatasAtas()[i]-this.kasusTaillard.getBatasBawah()[i])));
+            
+            System.out.println("Jumlah Populasi : " + jmlPopulasi);
+            this.algenArray[i] = new ALGEN(jmlPopulasi, banyakIndividu, kasusTaillard.getKumpulanSoal()[i].getSoal(), maksIterasi, peluangCO, peluangMutasi, this.batasAtas[i], this.batasBawah[i]);
+            this.pemenangTiapSoal[i] = this.algenArray[i].getPemenang();
+            this.makespanPemenang[i] = this.algenArray[i].getMakespanPemenang();
             this.batasAtas[i] = this.kasusTaillard.getBatasAtas()[i];
             this.batasBawah[i] = this.kasusTaillard.getBatasBawah()[i];
         }
@@ -75,6 +96,9 @@ public class Taillard {
     public int[] getMakespanPemenang() {
         return makespanPemenang;
     }
+
+    
+
 
     public int[] getBatasAtas() {
         return batasAtas;

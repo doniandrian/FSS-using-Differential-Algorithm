@@ -1,75 +1,86 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package algen;
 
 import java.util.Random;
 import fss.FSS;
 
-/**
- *
- * @author Andi
- */
 public class ALGEN {
-
+    
     private FSS penghasilMakespan;
     private int[][] jadwal;
-    private Individu[] individu;
+    private Individu[] populasi;
     private int[] perbandingan;
     private Individu pemenang;
     private int makespanPemenang;
+    private int panjangVektor;
+    private int batasAtas;
+    private int batasBawah;
 
-    public ALGEN(int banyakIndividu, int[][] jadwal, int maksIterasi, int peluangCO, int peluangMutasi) {
+    public ALGEN(int jmlPopulasi, int panjangVektor, int[][] jadwal, int maksIterasi, int peluangCO, int peluangMutasi, int batasAtas, int batasBawah) {
+        this.panjangVektor = panjangVektor;
+        this.batasBawah = batasBawah;
+        this.batasAtas = batasAtas;
+      
+        
+
+        this.populasi = new Individu[jmlPopulasi];
+
         this.jadwal = jadwal;
-        this.individu = new Individu[banyakIndividu];
-        this.perbandingan = new int[banyakIndividu];
-        for (int i = 0; i < this.individu.length; i++) {
-            individu[i] = new Individu(jadwal[0].length, jadwal.length);
+        
+        inisialisasiPopulasi();
+        getJadwalTerbaik(maksIterasi, peluangCO, peluangMutasi);
+        setMakespanPemenang();
+    }
+    
+    private void inisialisasiPopulasi() {
+        Random rand = new Random();
+        for (int i = 0; i < populasi.length; i++) {
+            populasi[i] = new Individu(jadwal[0].length, jadwal.length);
+            populasi[i].randomisasi();
         }
-        this.getJadwalTerbaik(maksIterasi, peluangCO, peluangMutasi);
-        this.setMakespanPemenang();
     }
 
     private void getJadwalTerbaik(int maksIterasi, int peluangCO, int peluangMutasi) {
         Random rand = new Random();
         int penghitung = 1;
-        int indexPemenang = this.getIndexPemenang();
+        int indexPemenang = getIndexPemenang();
         int periksaPeluang = 0;
+
         while (penghitung < maksIterasi) {
-            for (int i = 0; i < this.individu.length; i++) {
+            for (int i = 0; i < populasi.length; i++) {
                 if (i != indexPemenang) {
-                    int randomInduk1 = rand.nextInt(this.individu.length);
+                    int randomInduk1 = rand.nextInt(populasi.length);
                     while (randomInduk1 == indexPemenang) {
-                        randomInduk1 = rand.nextInt(this.individu.length);
+                        randomInduk1 = rand.nextInt(populasi.length);
                     }
-                    int randomInduk2 = rand.nextInt(this.individu.length);
+
+                    int randomInduk2 = rand.nextInt(populasi.length);
                     while (randomInduk2 == indexPemenang) {
-                        randomInduk2 = rand.nextInt(this.individu.length);
+                        randomInduk2 = rand.nextInt(populasi.length);
                     }
-                    periksaPeluang = rand.nextInt(100);
-                
-                     this.individu[i] = this.crossover(this.individu[randomInduk1], this.individu[randomInduk2],peluangCO);
-                
+
+                    Individu target = populasi[i];
+                    Individu mutan = crossover(populasi[randomInduk1], populasi[randomInduk2], peluangCO);
+
                     periksaPeluang = rand.nextInt(100);
                     if (periksaPeluang <= peluangMutasi) {
-                        this.individu[i] = this.mutasi(this.individu[i], pemenang, pemenang, randomInduk2);
+                        populasi[i] = mutasi(target, populasi[randomInduk1], populasi[randomInduk2], rand.nextDouble());
+                    } else {
+                        populasi[i] = selection(populasi[i], mutan);
                     }
                 }
             }
-            if (indexPemenang == this.getIndexPemenang()) {
+            if (indexPemenang == getIndexPemenang()) {
                 penghitung++;
             } else {
                 penghitung = 1;
             }
-            indexPemenang = this.getIndexPemenang();
+            indexPemenang = getIndexPemenang();
         }
-        this.pemenang = this.individu[indexPemenang];
+        this.pemenang = populasi[indexPemenang];
     }
-    
-    public void setMakespanPemenang(){
-        this.penghasilMakespan = new FSS(this.pemenang,this.jadwal);
+
+    public void setMakespanPemenang() {
+        this.penghasilMakespan = new FSS(this.pemenang, this.jadwal);
         this.makespanPemenang = this.penghasilMakespan.getMakespan();
     }
 
@@ -78,17 +89,16 @@ public class ALGEN {
     }
 
     public int getIndexPemenang() {
-        int simpanan = 0;
-        for (int i = 0; i < this.individu.length; i++) {
-            this.penghasilMakespan = new FSS(this.individu[i],this.jadwal);
-            this.perbandingan[i] = this.penghasilMakespan.getMakespan();
-        }
-        simpanan = Integer.MAX_VALUE;
+        int simpanan = Integer.MAX_VALUE;
         int indexPemenang = 0;
-        for (int i = 0; i < this.perbandingan.length; i++) {
+        this.perbandingan = new int[populasi.length];
+
+        for (int i = 0; i < populasi.length; i++) {
+            this.penghasilMakespan = new FSS(populasi[i], jadwal);
+            this.perbandingan[i] = this.penghasilMakespan.getMakespan();
             if (simpanan >= this.perbandingan[i]) {
                 simpanan = this.perbandingan[i];
-                this.pemenang = this.individu[i];
+                this.pemenang = populasi[i];
                 indexPemenang = i;
             }
         }
@@ -96,7 +106,7 @@ public class ALGEN {
     }
 
     public Individu getPemenang() {
-        return this.pemenang;
+        return pemenang;
     }
 
     public Individu crossover(Individu target, Individu mutan, double CR) {
@@ -104,89 +114,41 @@ public class ALGEN {
         int[] targetPekerjaan = target.getUrutanPekerjaan();
         int[] mutanPekerjaan = mutan.getUrutanPekerjaan();
         int[] trialPekerjaan = new int[targetPekerjaan.length];
-    
-        int jRand = rand.nextInt(targetPekerjaan.length); // Memilih indeks acak jRand
-    
+
         for (int i = 0; i < targetPekerjaan.length; i++) {
-            if (rand.nextDouble() < CR || i == jRand) {
+            if (rand.nextDouble() < CR) {
                 trialPekerjaan[i] = mutanPekerjaan[i];
             } else {
                 trialPekerjaan[i] = targetPekerjaan[i];
             }
         }
-    
+
         return new Individu(trialPekerjaan, target.getUrutanMesin().length);
     }
-    
 
-    public int[] crossoverPekerjaan(int[] urutanPekerjaan1, int[] urutanPekerjaan2) {
-        Random rand = new Random();
-        int penghitung1 = 0;
-        int penghitung2 = 0;
-        int[] urutanPekerjaanBaru = new int[urutanPekerjaan1.length];
-        for (int i = 0; i < urutanPekerjaanBaru.length; i++) {
-            urutanPekerjaanBaru[i] = rand.nextInt(2);
-            if (i == 0) {
-                if (urutanPekerjaanBaru[i] == 0) {
-                    urutanPekerjaanBaru[i] = urutanPekerjaan1[penghitung1];
-                    penghitung1++;
-                } else {
-                    urutanPekerjaanBaru[i] = urutanPekerjaan2[penghitung2];
-                    penghitung2++;
-                }
-            } else {
-                if (urutanPekerjaanBaru[i] == 0) {
-                    urutanPekerjaanBaru[i] = urutanPekerjaan1[penghitung1];
-                    while (this.periksaCrossover(urutanPekerjaanBaru, i, urutanPekerjaan1[penghitung1]) == false) {
-                        penghitung1++;
-                        if (penghitung1 > urutanPekerjaan1.length) {
-                            penghitung1 = 0;
-                        }
-                        urutanPekerjaanBaru[i] = urutanPekerjaan1[penghitung1];
-                    }
-                } else {
-                    urutanPekerjaanBaru[i] = urutanPekerjaan2[penghitung2];
-                    while (this.periksaCrossover(urutanPekerjaanBaru, i, urutanPekerjaan2[penghitung2]) == false) {
-                        penghitung2++;
-                        if (penghitung2 > urutanPekerjaan2.length) {
-                            penghitung2 = 0;
-                        }
-                        urutanPekerjaanBaru[i] = urutanPekerjaan2[penghitung2];
-                    }
-                }
-            }
-        }
-        return urutanPekerjaanBaru;
-    }
-
-
-    public boolean periksaCrossover(int[] urutanPekerjaanBaru, int penunjuk, int urutanPekerjaan1) {
-        for (int i = 0; i < penunjuk; i++) {
-            if (urutanPekerjaanBaru[i] == urutanPekerjaan1) {
-                return false;
-            }
-        }
-        return true;
-    }
     public Individu mutasi(Individu base, Individu ind1, Individu ind2, double F) {
         int[] basePekerjaan = base.getUrutanPekerjaan();
         int[] ind1Pekerjaan = ind1.getUrutanPekerjaan();
         int[] ind2Pekerjaan = ind2.getUrutanPekerjaan();
-    
+
         int[] mutanPekerjaan = new int[basePekerjaan.length];
-    
+
         for (int i = 0; i < basePekerjaan.length; i++) {
-            // Menerapkan mutasi sesuai formula DE: base + F * (ind1 - ind2)
             int diff = ind1Pekerjaan[i] - ind2Pekerjaan[i];
-            mutanPekerjaan[i] = basePekerjaan[i] + (int)(F * diff);
-    
-            // Memastikan bahwa hasil mutasi tidak keluar dari batas yang valid
+            mutanPekerjaan[i] = basePekerjaan[i] + (int) (F * diff);
             mutanPekerjaan[i] = Math.floorMod(mutanPekerjaan[i], basePekerjaan.length);
         }
-    
-        // Menciptakan individu baru dengan urutan pekerjaan yang telah dimutasi
+
         return new Individu(mutanPekerjaan, base.getUrutanMesin().length);
     }
-    
-    
+
+    private Individu selection(Individu target, Individu trial) {
+        FSS fssTarget = new FSS(target, jadwal);
+        FSS fssTrial = new FSS(trial, jadwal);
+
+        int targetMakespan = fssTarget.getMakespan();
+        int trialMakespan = fssTrial.getMakespan();
+
+        return (trialMakespan < targetMakespan) ? trial : target;
+    }
 }
