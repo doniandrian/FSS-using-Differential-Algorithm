@@ -49,7 +49,7 @@ public class Taillard {
              System.out.println("Batas Atas : " + this.kasusTaillard.getBatasAtas()[i]);
             System.out.println("Batas Bawah : " + this.kasusTaillard.getBatasBawah()[i]);
 
-            //
+            //inisialisasi jumlah populasi dengan rumus (batas bawah + random * (batas atas - batas bawah))
             int jmlPopulasi =  (int) ((batasBawah[i] + random * (this.kasusTaillard.getBatasAtas()[i]-this.kasusTaillard.getBatasBawah()[i])));
             
             System.out.println("Jumlah Populasi : " + jmlPopulasi);
